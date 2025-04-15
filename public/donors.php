@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>Integrity Watch Czech Republic</title>
+  <title>Integrity Watch Česká republika</title>
   <meta property="og:url" content="https://www.integritywatch.cz" />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Integrity Watch Czech Republic" />
-  <meta property="og:description" content="Integrity Watch Czech Republic" />
+  <meta property="og:title" content="Integrity Watch Česká republika" />
+  <meta property="og:description" content="Integrity Watch Česká republika" />
   <meta property="og:image" content="http://www.integritywatch.eu/images/thumbnail.jpg" />
   <link rel='shortcut icon' type='image/x-icon' href='/favicon.ico' />
   <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,700,800" rel="stylesheet">
@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css?family=Quicksand:500" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600,700,800" rel="stylesheet">
   <link rel="stylesheet" href="fonts/oswald.css">
-  <link rel="stylesheet" href="static/donors.css?v=6">
+  <link rel="stylesheet" href="static/donors.css?v=9">
 </head>
 <body>
     <div id="app" class="donors-page">   
@@ -29,7 +29,7 @@
               <h1>Integrity Watch Česká republika | Dárci</h1>
               <h2>Sekce sleduje individuální a firemní dárce vybraných politických stran a hnutí za období 2017-2022</h2>
               <a class="read-more-btn" href="./about.php">O projektu</a>
-              <button class="social-share-btn twitter-btn" @click="share('twitter')"><img src="./images/twitter-nobg.png" />Sdílet na X</button>
+              <button class="social-share-btn twitter-btn" @click="share('twitter')"><img src="./images/x.png" />Sdílet na X</button>
               <button class="social-share-btn  facebook-btn" @click="share('facebook')"><img src="./images/facebook-nobg.png" />Sdílet na Facebook</button>
               <p>Data můžete filtrovat kliknutím na vybraný subjekt nebo kategorii přímo v grafu</p>
             </div>
@@ -214,7 +214,7 @@
     <script type="text/javascript" src="vendor/js/dc.js"></script>
     <script type="text/javascript" src="vendor/js/dc.cloud.js"></script>
 
-    <script src="static/donors.js?v=6"></script>
+    <script src="static/donors.js?v=9"></script>
 
  
 </body>

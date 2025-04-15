@@ -36,33 +36,33 @@ var vuedata = {
   charts: {
     topDonorsPerson: {
       title: 'Největší individuální dárci',
-      info: 'Top individual donors'
+      info: 'Největší individuální dárci podle celkové výše přímých darů stranám.'
     },
     topDonorsBusiness: {
       title: 'Největší firemní dárci',
-      info: 'Top businesses by total value of donations to parties made directly by the business'
+      info: 'Největší firemní dárci podle celkové výše přímých darů stranám. V případech, kdy je firemním dárcem politická strana nebo hnutí, se nejedná o dar ale o rozdělování státních příspěvků mezi členy volební koalice na základě koaliční smlouvy.'
     },
     topDonorsPersonIndirect: {
       title: 'Největší dárci podle výše přímých a nepřimých darů',
-      info: 'Top beneficial owners by number of businesses'
+      info: 'Graf zobrazuje kombinovanou výši darů věnovaných fyzickou osobou přímo straně či hnutí a darů věnovaných onou osobou nepřímo přes právnickou osobu, kterou ovládá jakožto skutečný majitel (dle Evidence skutečných majitelů).'
     },
     entityType: {
       title: 'Objem darů podle právní formy dárce',
-      info: 'Parties by number of donations received (directly from the businesses)'
+      info: 'Objem darů od právnických osob podle právní formy dárce. Pozn.: § 18 zákona č. 424/1991 Sb. zakazuje politickým stranám přijmout dar nebo bezúplatné plnění od řady právních forem včetně příspěvkových státních institucí, příspěvkových organizací, obecně prospěšných společností a svěřenských fondů.'
     },
     years: {
       title: 'Objem darů v letech',
-      info: 'Parties by number of businesses who donated to them directly or whose beneficial owners donated to them.'
+      info: 'Filtrujte ostatní grafy kliknutím na jeden, nebo více let.'
     },
     parties: {
       title: 'Objem darů dle strany',
-      info: 'Type of donations made directly by businesses'
+      info: 'Filtrujte ostatní grafy podle strany kliknutím na příslušný sloupec.'
     },
     table: {
       chart: null,
       type: 'table',
       title: 'Dárci',
-      info: 'Lorem ipsum'
+      info: 'Tabulka poskytuje přehled všech dárců vybraných politických stran za sledované období. Dárce můžete seřadit podle celkové výše darů a jiných parametrů. Červená či oranžová vlaječka signalizuje možné riziko u dárce. Klikněnte na dárce pro kompletní přehled jeho přímých i nepřímých darů a bezúplatných plnění ve sledovaném období. U právnických osob najdete také přehled skutečných majitelů a ovládajících právnických osob.'
     }
   },
   selectedEl: {"Name": ""},
@@ -116,7 +116,7 @@ new Vue({
     share: function (platform) {
       if(platform == 'twitter'){
         var thisPage = window.location.href.split('?')[0];
-        var shareText = 'Integrity Watch Czech Republic ' + thisPage;
+        var shareText = 'Integrity Watch Česká republika ' + thisPage;
         var shareURL = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText);
         window.open(shareURL, '_blank');
         return;
@@ -303,7 +303,7 @@ function formatValue(x){
 function formatValueThousands(x){
   if(parseInt(x)){
     if(x > 1000){
-      return (x/1000).toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, " ") + 'k';
+      return (x/1000).toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' tis.';
     }
     return x.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   }
@@ -531,7 +531,6 @@ json('./data/donors_flagged.json?' + randomPar, (err, donors) => {
       var entryString = ' ' + d.from + ' ' + d.party + ' ' + d.donorRegistryName;
       if(d.donorKey8) {
         entryString = entryString + ' ' + d.donorKey8;
-        console.log(entryString);
       }
       return entryString.toLowerCase();
   });
@@ -922,9 +921,11 @@ json('./data/donors_flagged.json?' + randomPar, (err, donors) => {
               return '';
             }
             if(donorsKeyVal[d.donorKey].donorType) {
+              if(donorsKeyVal[d.donorKey].donorType == 'individual') { return 'Fyzická osoba'; }
+              if(donorsKeyVal[d.donorKey].donorType == 'legal entity') { return 'Právnická osoba'; }
               return donorsKeyVal[d.donorKey].donorType;
             }
-            return 'individual';
+            return 'Fyzická osoba';
           }
         },
         {
@@ -980,7 +981,7 @@ json('./data/donors_flagged.json?' + randomPar, (err, donors) => {
               return '';
             }
             if(donorsKeyVal[d.donorKey].foreignOwnerAtDonationsDate) {
-              return '<img src="./images/redflag.png" class="redflag-img">';
+              return '<img src="./images/orangeflag.png" class="redflag-img">';
             }
             return '';
           }
@@ -1059,14 +1060,20 @@ json('./data/donors_flagged.json?' + randomPar, (err, donors) => {
             if(a.type) { 
               if(a.type == 'service') {
                 if(a.donationAmt < 0 ) {
-                   return 'in-kind (returned donation)';
+                   return 'Bezúplatné plnění (Vracený dar)';
                 }
-                return 'in-kind';
+                return 'Bezúplatné plnění';
+              } else if(a.type == 'monetary') {
+                if(a.donationAmt < 0 ) {
+                  return 'Peněžitý dar (Vracený dar)';
+                }
+                return 'Peněžitý dar';
+              } else {
+                if(a.donationAmt < 0 ) {
+                  return a.type + ' (Vracený dar)';
+                }
+                return a.type;
               }
-              if(a.donationAmt < 0 ) {
-                return a.type + ' (returned donation)';
-              }
-              return a.type;
             }
             return "N/A";
           }

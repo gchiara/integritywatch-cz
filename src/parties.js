@@ -37,51 +37,45 @@ var vuedata = {
   charts: {
     donations: {
       title: 'Objem darů a bezúplatných plnění',
-      info: 'Lorem ipsum'
+      info: 'Součet peněžitých darů a hodnoty bezúplatných plnění za daný rok v celých tisících Kč.'
     },
     donationsNum: {
       title: 'Počet darů a bezúplatných plnění',
-      info: 'Lorem ipsum'
+      info: 'Počet jednotlivých darů a bezúplatných plnění za daný rok.'
     },
     incomeShares: {
       title: 'Příjmy politických stran podle zdroje',
-      info: 'Income share divided by state contributions, individual donations and corporate donations'
+      info: 'Rozbor příjmů stran podle jejich zdroje: fyzické osoby, právnické osoby a finance od státu. Kategorie „Jiné zdroje“ obsahuje všechny příjmy nespojené s přímou podporou strany od soukromých osob, firem či státu. Kvůli finančním nesrovnalostem ve zdrojích, ze kterých graf čerpá, v některých případech může součet podílů převyšovat 100 %.'
     },
-    /*
-    subsidies: {
-      title: 'State contributions',
-      info: 'Lorem ipsum'
-    },
-    */
     income: {
       title: 'Celkové příjmy dle strany',
-      info: 'Lorem ipsum'
+      info: 'Celkové příjmy vykázané ve výročních finančních zprávách stran za daný rok.'
     },
     expenses: {
       title: 'Celkové výdaje dle strany',
-      info: 'Lorem ipsum'
+      info: 'Celkové výdaje vykázané ve výročních finančních zprávách stran za daný rok.'
     },
     topDonorPercent: {
       title: 'Podíl 5 největších dárců v rámci celkového příjmu strany',
-      info: 'Lorem ipsum'
+      info: 'Graf zobrazuje kombinovaný podíl pěti největších dárců stran na jejich celkovém příjmu v daném roce. Pomáhá tak identifikovat strany, které jsou z velké části financovány malou skupinou podporovatelů. Významným dárcem může ovšem být i jiná politická strana. V takových případech se nejedná o dary, ale o rozdělování státních příspěvků mezi členy volební koalice na základě koaliční smlouvy.'
     },
     incomeType: {
       title: 'Příjem dle kategorie',
-      info: 'Lorem ipsum'
+      info: 'Příjmy vykázané stranami podle kategorií příjmů stanovených vyhláškou č. 114/2017 Sb.'
     },
     expensesType: {
       title: 'Výdaje dle kategorie',
-      info: 'Lorem ipsum'
+      info: 'Výdaje vykázané stranami podle kategorií výdajů stanovených vyhláškou č. 114/2017 Sb.'
     },
     subsidiesType: {
       title: 'Státní příspěvky dle typu',
-      info: 'Lorem ipsum'
+      info: 'Strany mají za určitých podmínek nárok na různé typy příspěvků ze státního rozpočtu, které stanovují § 20-20b zákona č. 424/1991 Sb.'
     },
     table: {
       chart: null,
       type: 'table',
       title: 'Strany',
-      info: 'Lorem ipsum'
+      info: 'Tabulka poskytuje přehled celkových příjmů, výdajů, státních příspěvků, darů a bezúplatných plnění všech sledovaných stran za vybraný rok. Klikněte na stranu pro kompletní přehled darů a bezúplatných plnění, státních příspěvků a výčet pěti největších dárců za celé sledované období. Dary lze vyhledávat a řadit podle jména/názvu a data narození/IČO dárce nebo data, popisu, typu a výše daru.'
     }
   },
   selectedEl: {"Name": ""},
@@ -166,7 +160,7 @@ new Vue({
     share: function (platform) {
       if(platform == 'twitter'){
         var thisPage = window.location.href.split('?')[0];
-        var shareText = 'Integrity Watch Czech Republic ' + thisPage;
+        var shareText = 'Integrity Watch Česká republika ' + thisPage;
         var shareURL = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareText);
         window.open(shareURL, '_blank');
         return;
@@ -360,7 +354,7 @@ function formatValue(x){
 function formatValueThousands(x){
   if(parseInt(x)){
     if(x > 1000){
-      return (x/1000).toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, " ") + 'k';
+      return (x/1000).toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, " ") + ' tis.';
     }
     return x.toString().replace(".",",").replace(/\B(?=(\d{3})+(?!\d))/g, " ");
   }
@@ -549,7 +543,7 @@ json('./data/parties.json?' + randomPar, (err, parties) => {
   //Set dc main vars
   var ndx = crossfilter(parties);
   var searchDimension = ndx.dimension(function (d) {
-      var entryString = "" + d.name + " " + d.id;
+      var entryString = "" + d.display_name + " " + d.id;
       return entryString.toLowerCase();
   });
 
@@ -636,7 +630,7 @@ json('./data/parties.json?' + randomPar, (err, parties) => {
           return d.key + ': ' + formatValue(d.value) + ' donations';
       })
       .elasticX(true)
-      .xAxis().ticks(3).tickFormat(function(d) { return formatValueThousands(d) + '' });;
+      .xAxis().ticks(3).tickFormat(function(d) { return formatValue(d) + '' });;
     chart.render();
   }
 
@@ -972,7 +966,7 @@ json('./data/parties.json?' + randomPar, (err, parties) => {
         if(thisKey == 'Others') {
           thisKey = 'Ostatní';
         }
-        if(d.value[d.key]) {
+        if(d.value[d.key] || d.value[d.key] == 0) {
           var percent = d.value[d.key] / group.all().reduce(function(a, v){ return a + v.value[v.key]; }, 0);
           percent = percent*100;
           return thisKey + ': ' + formatValue(d.value[d.key].toFixed(2)) + ' Kč' + ' (' + percent.toFixed(1).replace('.',',') +' %)';
@@ -1053,7 +1047,7 @@ json('./data/parties.json?' + randomPar, (err, parties) => {
         if(thisKey == 'Others') {
           thisKey = 'Ostatní';
         }
-        if(d.value[d.key]) {
+        if(d.value[d.key] || d.value[d.key] == 0) {
           var percent = d.value[d.key] / group.all().reduce(function(a, v){ return a + v.value[v.key]; }, 0);
           percent = percent*100;
           return thisKey + ': ' + formatValue(d.value[d.key].toFixed(2)) + ' Kč' + ' (' + percent.toFixed(1).replace('.',',') +' %)';
@@ -1135,7 +1129,7 @@ json('./data/parties.json?' + randomPar, (err, parties) => {
         if(thisKey == 'Others') {
           thisKey = 'Ostatní';
         }
-        if(d.value[d.key]) {
+        if(d.value[d.key] || d.value[d.key] == 0) {
           var percent = d.value[d.key] / group.all().reduce(function(a, v){ return a + v.value[v.key]; }, 0);
           percent = percent*100;
           return thisKey + ': ' + formatValue(d.value[d.key].toFixed(2)) + ' Kč' + ' (' + percent.toFixed(1) +' %)';
@@ -1193,7 +1187,10 @@ json('./data/parties.json?' + randomPar, (err, parties) => {
           "type": "czstring",
           "defaultContent":"N/A",
           "data": function(d) {
-            return d.display_name;
+            if(d.display_name) {
+              return d.display_name;
+            }
+            return "N/A";
           }
         },
         {
@@ -1203,7 +1200,10 @@ json('./data/parties.json?' + randomPar, (err, parties) => {
           "type": "currency-amt",
           "defaultContent":"N/A",
           "data": function(d) {
-            return formatValue(d.yearData.incomeTot.toFixed(2)) + ' Kč';
+            if(d.yearData && d.yearData.incomeTot) {
+              return formatValue(d.yearData.incomeTot.toFixed(2)) + ' Kč';
+            }
+            return "N/A";
           }
         },
         {
@@ -1213,7 +1213,10 @@ json('./data/parties.json?' + randomPar, (err, parties) => {
           "type": "currency-amt",
           "defaultContent":"N/A",
           "data": function(d) {
-            return formatValue(d.yearData.expensesTot.toFixed(2)) + ' Kč';
+            if(d.yearData && d.yearData.expensesTot) {
+              return formatValue(d.yearData.expensesTot.toFixed(2)) + ' Kč';
+            }
+            return "N/A";
           }
         },
         {
@@ -1223,7 +1226,10 @@ json('./data/parties.json?' + randomPar, (err, parties) => {
           "type": "currency-amt",
           "defaultContent":"N/A",
           "data": function(d) {
-            return formatValue(d.yearData.subsidiesAmtTot.toFixed(2)) + ' Kč';
+            if(d.yearData && d.yearData.subsidiesAmtTot) {
+              return formatValue(d.yearData.subsidiesAmtTot.toFixed(2)) + ' Kč';
+            }
+            return "N/A";
           }
         },
         {
@@ -1233,7 +1239,10 @@ json('./data/parties.json?' + randomPar, (err, parties) => {
           "type": "currency-amt",
           "defaultContent":"N/A",
           "data": function(d) {
-            return formatValue(d.yearData.donationsAmtMonetary.toFixed(2)) + ' Kč';
+            if(d.yearData && d.yearData.donationsAmtMonetary) {
+              return formatValue(d.yearData.donationsAmtMonetary.toFixed(2)) + ' Kč';
+            }
+            return "N/A";
           }
         },
         {
@@ -1243,7 +1252,10 @@ json('./data/parties.json?' + randomPar, (err, parties) => {
           "type": "currency-amt",
           "defaultContent":"N/A",
           "data": function(d) {
-            return formatValue(d.yearData.donationsAmtService.toFixed(2)) + ' Kč';
+            if(d.yearData && d.yearData.donationsAmtService) {
+              return formatValue(d.yearData.donationsAmtService.toFixed(2)) + ' Kč';
+            }
+            return "N/A";
           }
         }
       ],
@@ -1358,16 +1370,23 @@ json('./data/parties.json?' + randomPar, (err, parties) => {
         },
         { "data" : function(a) { 
             if(a.type) { 
+
               if(a.type == 'service') {
                 if(a.amount < 0 ) {
-                   return 'in-kind (returned donation)';
+                   return 'Bezúplatné plnění (Vracený dar)';
                 }
-                return 'in-kind';
+                return 'Bezúplatné plnění';
+              } else if(a.type == 'monetary') {
+                if(a.amount < 0 ) {
+                  return 'Peněžitý dar (Vracený dar)';
+                }
+                return 'Peněžitý dar';
+              } else {
+                if(a.amount < 0 ) {
+                  return a.type + ' (Vracený dar)';
+                }
+                return a.type;
               }
-              if(a.amount < 0 ) {
-                return a.type + ' (returned donation)';
-              }
-              return a.type;
             }
             return "N/A";
           }
@@ -1424,7 +1443,7 @@ json('./data/parties.json?' + randomPar, (err, parties) => {
   function doneTyping () {
     var s = $input.val().toLowerCase();
     searchDimension.filter(function(d) { 
-      return d.indexOf(s) !== -1;
+      return d.indexOf(s.toLowerCase()) !== -1;
     });
     throttle();
     var throttleTimer;
